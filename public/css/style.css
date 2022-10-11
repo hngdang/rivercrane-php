@@ -1,0 +1,48 @@
+* {
+    padding: 0;
+    margin: 0;
+}
+
+.login-form {
+    padding-top: 15%;
+}
+
+.login-form img {
+    padding-bottom: 5%;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+}
+
+.login-input i {
+    position: absolute;
+}
+
+.login-input {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.icon {
+    padding: 10px;
+    min-width: 40px;
+}
+
+.input-field {
+    width: 100%;
+    padding-left: 30px;
+}
+
+.text-error {
+    color: red;
+    padding: 10px;
+}
+
+.logo {
+    max-width: 200px;
+}
+
+tr:nth-child(even) {
+    background-color: #efefef;
+}
