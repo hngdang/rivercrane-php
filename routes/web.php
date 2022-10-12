@@ -23,4 +23,8 @@ Route::middleware('auth')->prefix('/')->group(function(){
     
     Route::get('/users', [UserController::class,'index'])->name('get.users');
     Route::post('/users', [UserController::class,'store']);
+    Route::get('/users/edit/{id}', [UserController::class,'edit']);
+    Route::post('/users/edit/{id}', [UserController::class,'update']);
+    Route::post('/users/block/{id}', [UserController::class,'block']);
+    Route::post('/users/delete/{id}', [UserController::class,'delete']);
 });

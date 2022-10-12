@@ -17,7 +17,8 @@ class AuthController extends Controller
         $login = [
             'email' => $request->email,
             'password' => $request->password,
-            'is_active' => true
+            'is_active' => true,
+            'is_delete' => false
         ];
 
         $remember_me = $request->has('remember')?true:false;

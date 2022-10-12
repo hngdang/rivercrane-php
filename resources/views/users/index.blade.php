@@ -5,7 +5,7 @@
 @section('content')
     <div class="d-flex justify-content-between border-bottom pb-2">
         <h3>Nhân viên</h3>
-        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addUserModal">
+        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" id="addUserButton" data-bs-target="#addUserModal">
             <i class="bi bi-person-plus-fill me-2"></i>Thêm mới
         </button>
         @include('modals.add-user')
@@ -78,11 +78,17 @@
                 <td>{{$user->group->name}}</td>
                 <td class="{{$user->getStatus($user->is_active)['class']}}">{{$user->getStatus($user->is_active)['name']}}</td>
                 <td>
-                    <i class="bi bi-pencil-fill me-1 text-info" type="button" data-bs-toggle="modal" data-bs-target="#editUserModal"></i>
+                    <button type="button" class="btn btn-sm editButton" value="{{$user->id}}">
+                        <i class="bi bi-pencil-fill text-info"></i>
+                    </button>
                     @include('modals.edit-user')
-                    <i class="bi bi-trash-fill me-1 text-danger" type="button" data-bs-toggle="modal" data-bs-target="#deleteUserModal"></i>
+                    <button type="button" class="btn btn-sm deleteButton" value="{{$user->id}}">
+                        <i class="bi bi-trash-fill text-danger"></i>
+                    </button>
                     @include('modals.delete-user')
-                    <i class="bi bi-person-x-fill" type="button" data-bs-toggle="modal" data-bs-target="#blockUserModal"></i>
+                    <button type="button" class="btn btn-sm blockButton" value="{{$user->id}}">
+                        <i class="bi bi-person-x-fill"></i>
+                    </button>
                     @include('modals.block-user')
                 </td>
             </tr> 
@@ -101,32 +107,167 @@
     @endempty
 @endsection
 
-{{-- @section('scripts')
+@section('scripts')
     <script>
         $(document).ready(function () {
-            $(document).on('click', '.add_user' ,function (e) {
+            $(document).on('click', '.addUser', function (e) {
                 e.preventDefault();
                 var data = {
-                    'name': $('.userName').val(),
-                    'email': $('.userEmail').val(),
+                    'name': $('.name').val(),
+                    'email': $('.email').val(),
                     'password': $('.password').val(),
                     'confirm': $('.confirm').val(),
                     'group': $('.group').val(),
-                    'status': $('.status').val()
+                    'status': $(".status:checked").val()
                 }
 
-                console.log(data);
-                
-                /* $.ajax({
+                $.ajaxSetup({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    }
+                });
+
+                $.ajax({
                     type: "POST",
-                    url: "/internship/users",
+                    url: "/rivercrane/users",
                     data: data,
                     dataType: "json",
                     success: function (response) {
-                        console.log(response);
+                        if(response.status == 200){
+                            $(document).ajaxStop(function(){
+                                window.location.reload();
+                            });
+                        }else{
+                            $.each(response.errors, function (key, value) { 
+                                $('span.'+key+'_error').html("");
+                                $('span.'+key+'_error').removeClass("d-none");
+                                $('span.'+key+'_error').text(value[0]);
+                            });
+                        }
                     }
-                }); */
+                });
+            });
+
+            $(document).on('click', '.editButton', function (e) {
+                e.preventDefault();
+                var userId = $(this).val();
+                $('#editUserModal').modal('show');
+
+                $.ajax({
+                    type: "GET",
+                    url: "/rivercrane/users/edit/"+userId,
+                    success: function (response) {
+                        if(response.status == 200){
+                            $('#editUserName').val(response.user.name);
+                            $('#editUserEmail').val(response.user.email);
+                            $('#editUserGroup').val(response.user.group_role);
+                            $('#editUserStatus').val(response.user.is_active);
+                            $('#editUserId').val(response.user.id);
+                        }
+                    }
+                });
+            });
+
+            $(document).on('click', '.editUser', function (e) {
+                e.preventDefault();
+                var userId = $('#editUserId').val();
+
+                var data = {
+                    'name': $('#editUserName').val(),
+                    'email': $('#editUserEmail').val(),
+                    'password': $('#editUserPass').val(),
+                    'confirm': $('#editUserConfirm').val(),
+                    'group': $('#editUserGroup').val(),
+                    'status': $("#editUserStatus:checked").val()
+                }
+
+                $.ajaxSetup({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    }
+                });
+
+                $.ajax({
+                    type: "POST",
+                    url: "/rivercrane/users/edit/"+userId,
+                    data: data,
+                    dataType: "json",
+                    success: function (response) {
+                        if(response.status == 200){
+                            $(document).ajaxStop(function(){
+                                window.location.reload();
+                            });
+                        }else{
+                            $.each(response.errors, function (key, value) { 
+                                $('span.'+key+'_error').html("");
+                                $('span.'+key+'_error').removeClass("d-none");
+                                $('span.'+key+'_error').text(value[0]);
+                            });
+                        }
+                    }
+                });
+            });
+
+            
+            $(document).on('click', '.deleteButton', function (e) {
+                e.preventDefault();
+                var userId = $(this).val();
+                $('#deleteUserId').val(userId);
+                $('#deleteUserModal').modal('show');
+            });
+
+            $(document).on('click', '.deleteUser', function (e) {
+                e.preventDefault();
+                var userId = $('#deleteUserId').val();
+
+                $.ajaxSetup({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    }
+                });
+
+                $.ajax({
+                    type: "POST",
+                    url: "/rivercrane/users/delete/"+userId,
+                    success: function (response) {
+                        if(response.status == 200){
+                            $(document).ajaxStop(function(){
+                                window.location.reload();
+                            });
+                        }
+                    }
+                });
+            });
+
+            $(document).on('click', '.blockButton', function (e) {
+                e.preventDefault();
+                var userId = $(this).val();
+                $('#blockUserId').val(userId);
+                $('#blockUserModal').modal('show');
+            });
+
+            $(document).on('click', '.blockUser', function (e) {
+                e.preventDefault();
+                var userId = $('#blockUserId').val();
+
+                $.ajaxSetup({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    }
+                });
+
+                $.ajax({
+                    type: "POST",
+                    url: "/rivercrane/users/block/"+userId,
+                    success: function (response) {
+                        if(response.status == 200){
+                            $(document).ajaxStop(function(){
+                                window.location.reload();
+                            });
+                        }
+                    }
+                });
             });
         });
     </script>
-@endsection --}}
+@endsection
