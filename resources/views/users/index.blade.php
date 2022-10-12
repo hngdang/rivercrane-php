@@ -3,7 +3,6 @@
 @section('title','Quản lý nhân viên')
 
 @section('content')
-<h1></h1>
     <div class="d-flex justify-content-between border-bottom pb-2">
         <h3>Nhân viên</h3>
         <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" id="addUserButton" data-bs-target="#addUserModal">
